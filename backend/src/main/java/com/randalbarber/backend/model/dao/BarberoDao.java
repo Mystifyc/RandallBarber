@@ -1,10 +1,10 @@
-package com.randalbarber.backend.service;
+package com.randalbarber.backend.model.dao;
 
 import java.util.List;
 import java.util.Optional;
-import com.randalbarber.backend.entity.Barbero;
+import com.randalbarber.backend.model.entity.Barbero;
 
-public interface BarberoService {
+public interface BarberoDao {
     List<Barbero> listarTodos();
     List<Barbero> listarActivos();
     Optional<Barbero> buscarPorId(Long id);
