@@ -10,9 +10,9 @@ import com.randalbarber.backend.repository.ClienteRepository;
 @Service
 public class ClienteDaoImp implements ClienteDao{
 
-    private final   ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
 
-    public  ClienteDaoImp(ClienteRepository clienteRepository) {
+    public ClienteDaoImp(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }
 

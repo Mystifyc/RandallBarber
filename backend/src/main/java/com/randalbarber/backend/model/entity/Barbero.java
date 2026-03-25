@@ -15,13 +15,12 @@ public class Barbero extends Usuario {
         super();
     }
 
-  public Barbero(Long id, String nombre, String telefono,
-               String especialidad, Boolean activo) {
-    super(id, nombre, telefono);
-    this.especialidad = especialidad;
-    this.activo = activo;
+    public Barbero(Long id, String nombre, String telefono, String especialidad, Boolean activo) {
+        super(id, nombre, telefono);
+        this.especialidad = especialidad;
+        this.activo = activo;
 
-}
+    }
 
     public String getEspecialidad() {
         return especialidad;

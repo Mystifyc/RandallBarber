@@ -9,15 +9,13 @@ public class Cliente extends Usuario {
     private String correo;
 
     public Cliente() {
-        super();
+      super();
     }
 
-  public Cliente(Long id, String nombre, String telefono,
-               String correo) {
+  public Cliente(Long id, String nombre, String telefono, String correo) {
     super(id, nombre, telefono);
     this.correo = correo;
-
-   }
+  }
 
   public String getCorreo() {
     return correo;
