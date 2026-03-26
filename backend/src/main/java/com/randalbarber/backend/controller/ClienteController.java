@@ -5,47 +5,42 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.randalbarber.backend.model.dao.BarberoDao;
-import com.randalbarber.backend.model.entity.Barbero;
+import com.randalbarber.backend.model.dao.ClienteDao;
+import com.randalbarber.backend.model.entity.Cliente;
 
 @RestController
-@RequestMapping("/api/barberos")
+@RequestMapping("/api/clientes")
 @CrossOrigin(origins = "http://localhost:5173")
-public class BarberoController {
+public class ClienteController {
 
-    private final BarberoDao barberoService;
+     private final ClienteDao clienteDao;
 
-    public BarberoController(BarberoDao barberoService) {
-        this.barberoService = barberoService;
+    public ClienteController(ClienteDao clienteDao) {
+        this.clienteDao = clienteDao;
     }
 
     @GetMapping
-    public List<Barbero> listarTodos() {
-        return barberoService.listarTodos();
-    }
-
-    @GetMapping("/activos")
-    public List<Barbero> listarActivos() {
-        return barberoService.listarActivos();
+    public List<Cliente> listarClientes() {
+        return clienteDao.listarClientes();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
-        return barberoService.buscarPorId(id)
+        return clienteDao.buscarPorId(id)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Barbero> guardar(@RequestBody Barbero barbero) {
-        Barbero nuevo = barberoService.guardar(barbero);
+    public ResponseEntity<Cliente> guardar(@RequestBody Cliente cliente) {
+        Cliente nuevo = clienteDao.guardar(cliente);
         return ResponseEntity.ok(nuevo);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Barbero barbero) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
         try {
-            Barbero actualizado = barberoService.actualizar(id, barbero);
+            Cliente actualizado = clienteDao.actualizar(id, cliente);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -55,10 +50,11 @@ public class BarberoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         try {
-            barberoService.eliminar(id);
+            clienteDao.eliminar(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
+    
 }
