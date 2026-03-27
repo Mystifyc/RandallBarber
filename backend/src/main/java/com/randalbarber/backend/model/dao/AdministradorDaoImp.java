@@ -1,11 +1,15 @@
 package com.randalbarber.backend.model.dao;
 
+import org.springframework.stereotype.Repository;
+
 import com.randalbarber.backend.model.entity.Administrador;
 import com.randalbarber.backend.repository.AdministradorRepository;
 
+@Repository
 public class AdministradorDaoImp implements AdministradorDao {
 
-    private AdministradorRepository administradorRepository;
+
+    private  AdministradorRepository administradorRepository;
 
     @Override
     public Administrador guardarAdministrador(Administrador administrador){
@@ -17,15 +21,15 @@ public class AdministradorDaoImp implements AdministradorDao {
         return administradorRepository.findById(id).map(a -> {
             a.setNombre(administrador.getNombre());
             a.setTelefono(administrador.getTelefono());
-            a.setTelefono(administrador.getTelefono());
+            a.setCorreo(administrador.getCorreo());
             return administradorRepository.save(a);
-        }).orElseThrow(() -> new RuntimeException("Barbero no encontrado con id: " + id));
+        }).orElseThrow(() -> new RuntimeException("Admninistrador no encontrado con id: " + id));
     }
 
     @Override
     public void eliminarAdministrador(Long id) {
         if (!administradorRepository.existsById(id)) {
-            throw new RuntimeException("Barbero no encontrado con id: " + id);
+            throw new RuntimeException("Administrador no encontrado con id: " + id);
         }
         administradorRepository.deleteById(id);
     }
