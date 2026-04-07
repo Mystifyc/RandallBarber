@@ -13,7 +13,7 @@ import com.randalbarber.backend.model.entity.Cliente;
 @CrossOrigin(origins = "http://localhost:5173")
 public class ClienteController {
 
-     private final ClienteDao clienteDao;
+    private final ClienteDao clienteDao;
 
     public ClienteController(ClienteDao clienteDao) {
         this.clienteDao = clienteDao;
