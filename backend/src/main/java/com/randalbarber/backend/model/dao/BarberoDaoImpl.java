@@ -1,15 +1,17 @@
 package com.randalbarber.backend.model.dao;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
+
+import org.springframework.stereotype.Repository;
 
 import com.randalbarber.backend.model.entity.Barbero;
 import com.randalbarber.backend.repository.BarberoRepository;
 
 
-@Service
+@Repository
 public class BarberoDaoImpl implements BarberoDao {
 
+    
     private final BarberoRepository barberoRepository;
 
     public BarberoDaoImpl(BarberoRepository barberoRepository) {
