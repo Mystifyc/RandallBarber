@@ -1,4 +1,5 @@
 import "./App.css";
+import AgendaForm from "./components/AgendaForm";
 
 function App() {
   return (
@@ -18,7 +19,15 @@ function App() {
           <a href="#contacto">Contacto</a>
         </nav>
 
-        <button className="nav-button">Reservar</button>
+        <button
+          className="nav-button"
+          onClick={() => {
+            const section = document.getElementById("agenda");
+            section?.scrollIntoView({ behavior: "smooth" });
+          }}
+        >
+          Reservar
+        </button>
       </header>
 
       {/* HERO */}
@@ -33,8 +42,25 @@ function App() {
           </p>
 
           <div className="hero-buttons">
-            <button className="btn-primary">Agendar cita</button>
-            <button className="btn-secondary">Ver servicios</button>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                const section = document.getElementById("agenda");
+                section?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Agendar cita
+            </button>
+
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                const section = document.getElementById("servicios");
+                section?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Ver servicios
+            </button>
           </div>
         </div>
 
@@ -58,33 +84,25 @@ function App() {
         <div className="cards">
           <article className="card">
             <h3>Corte clásico</h3>
-            <p>
-              Un corte limpio y profesional, ideal para cualquier ocasión.
-            </p>
+            <p>Un corte limpio y profesional, ideal para cualquier ocasión.</p>
             <span>$20.000</span>
           </article>
 
           <article className="card">
             <h3>Barba</h3>
-            <p>
-              Perfilado y arreglo de barba con acabado preciso y elegante.
-            </p>
+            <p>Perfilado y arreglo de barba con acabado preciso y elegante.</p>
             <span>$15.000</span>
           </article>
 
           <article className="card">
             <h3>Corte + barba</h3>
-            <p>
-              El combo perfecto para renovar tu imagen en una sola sesión.
-            </p>
+            <p>El combo perfecto para renovar tu imagen en una sola sesión.</p>
             <span>$30.000</span>
           </article>
 
           <article className="card">
             <h3>Servicio premium</h3>
-            <p>
-              Atención completa con detalles extra para una mejor experiencia.
-            </p>
+            <p>Atención completa con detalles extra para una mejor experiencia.</p>
             <span>$40.000</span>
           </article>
         </div>
@@ -95,9 +113,7 @@ function App() {
         <div className="section-header">
           <p className="section-tag">Equipo</p>
           <h2>Nuestros barberos</h2>
-          <p>
-            Luego aquí puedes poner fotos reales, nombres reales y especialidades.
-          </p>
+          <p>Luego aquí puedes poner fotos reales, nombres reales y especialidades.</p>
         </div>
 
         <div className="barbers">
@@ -122,25 +138,18 @@ function App() {
       </section>
 
       {/* AGENDA */}
-      <section className="section" id="agenda">
-        <div className="section-header">
-          <p className="section-tag">Agenda</p>
-          <h2>Reserva tu espacio</h2>
-          <p>
-            Más adelante aquí podemos conectar el sistema de citas real con el backend.
-          </p>
-        </div>
+<section className="section agenda-section" id="agenda">
+  <div className="section-header">
+    <p className="section-tag">Agenda</p>
+    <h2>Reserva tu espacio</h2>
+    <p>
+      Selecciona tu servicio, tu barbero, la fecha y la hora disponible
+      para confirmar tu cita.
+    </p>
+  </div>
 
-        <div className="booking-box">
-          <div>
-            <h3>Agenda rápida</h3>
-            <p>
-              Selecciona tu servicio, el barbero y el horario disponible.
-            </p>
-          </div>
-          <button className="btn-primary">Empezar reserva</button>
-        </div>
-      </section>
+  <AgendaForm />
+</section>
 
       {/* CONTACTO */}
       <section className="section alt-section" id="contacto">
