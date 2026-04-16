@@ -1,9 +1,71 @@
+import { useEffect, useState } from "react";
 import "./App.css";
+import LoginModal from "./components/auth/LoginModal";
+import DashboardLayout from "./components/dashboard/DashboardLayout";
+import { useAuth } from "./context/Authcontext";
+import AgendaForm from "./components/AgendaForm";
+import { obtenerBarberos, type Barbero } from "./api/barberosApi";
+import { obtenerServicios, type Servicio } from "./api/serviciosApi";
+import heroBarber from "./assets/hero-barber.png";
+import barberoJuan from "./assets/barbero-juan.png";
+import barberoCarlos from "./assets/barbero-carlos.png";
+import barberoMateo from "./assets/barbero-mateo.png";
+import servicioCorte from "./assets/servicio-corte.jpg";
+import servicioFade from "./assets/servicio-fade.jpg";
+import servicioBarba from "./assets/servicio-barba.jpg";
+import servicioCombo from "./assets/servicio-combo.png";
 
 function App() {
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+  const { usuario, logout } = useAuth();
+  const [barberos, setBarberos] = useState<Barbero[]>([]);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [cargandoLanding, setCargandoLanding] = useState(true);
+
+  const abrirLogin = () => setMostrarLogin(true);
+  const cerrarLogin = () => setMostrarLogin(false);
+
+  const imagenesBarberos: Record<string, string> = {
+    "Juan Estilo": barberoJuan,
+    "Carlos Blade": barberoCarlos,
+    "Mateo Fresh": barberoMateo,
+  };
+
+  const imagenesServicios: Record<string, string> = {
+    "Corte clásico": servicioCorte,
+    "Fade premium": servicioFade,
+    "Arreglo de barba": servicioBarba,
+    "Corte + barba": servicioCombo,
+  };
+
+  useEffect(() => {
+    const cargarDatosLanding = async () => {
+      try {
+        const [barberosData, serviciosData] = await Promise.all([
+          obtenerBarberos(),
+          obtenerServicios(),
+        ]);
+
+        setBarberos(barberosData);
+        setServicios(serviciosData);
+      } catch (error) {
+        console.error("Error cargando datos de la landing:", error);
+      } finally {
+        setCargandoLanding(false);
+      }
+    };
+
+    cargarDatosLanding();
+  }, []);
+
+  if (usuario?.rol === "ADMIN" || usuario?.rol === "BARBERO") {
+    return <DashboardLayout />;
+  }
+
   return (
     <div className="app">
-      {/* NAVBAR */}
+      <LoginModal abierto={mostrarLogin} onClose={cerrarLogin} />
+
       <header className="navbar">
         <div className="logo">
           <span className="logo-main">Randall</span>
@@ -18,131 +80,147 @@ function App() {
           <a href="#contacto">Contacto</a>
         </nav>
 
-        <button className="nav-button">Reservar</button>
+        {!usuario ? (
+          <button className="nav-button" onClick={abrirLogin}>
+            Iniciar sesión
+          </button>
+        ) : (
+          <div className="user-actions">
+            <div className="client-session-box">
+              <div className="client-session-info">
+                <span className="client-session-label">Sesión activa</span>
+                <span className="client-session-name">{usuario.nombre}</span>
+              </div>
+
+              <button className="client-logout-btn" onClick={logout}>
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* HERO */}
       <section className="hero" id="inicio">
         <div className="hero-text">
           <p className="tag">Estilo, precisión y confianza</p>
           <h1>Tu barbería de confianza para verte al máximo nivel</h1>
           <p className="hero-description">
-            En RandallBarber transformamos tu estilo con cortes modernos,
-            atención personalizada y una experiencia cómoda desde que llegas
-            hasta que sales.
+            En RandallBarber elevamos tu imagen con cortes modernos, atención personalizada
+            y una experiencia pensada para que te sientas cómodo, seguro y con estilo.
           </p>
 
           <div className="hero-buttons">
-            <button className="btn-primary">Agendar cita</button>
-            <button className="btn-secondary">Ver servicios</button>
+            <a href="#agenda" className="btn-primary">
+              Agendar cita
+            </a>
+            <a href="#servicios" className="btn-secondary">
+              Ver servicios
+            </a>
           </div>
-        </div>
+        </div>  
 
         <div className="hero-image">
           <div className="image-card">
-            <span>Espacio para imagen principal</span>
-          </div>
+            <img src={heroBarber} alt="Barbero principal RandallBarber" className="hero-img" />          </div>
         </div>
       </section>
 
-      {/* SERVICIOS */}
       <section className="section" id="servicios">
         <div className="section-header">
           <p className="section-tag">Servicios</p>
           <h2>Lo que ofrecemos</h2>
           <p>
-            Puedes cambiar estos servicios, precios y descripciones después.
+            Descubre nuestros servicios pensados para resaltar tu estilo y tu mejor versión.
           </p>
         </div>
 
         <div className="cards">
-          <article className="card">
-            <h3>Corte clásico</h3>
-            <p>
-              Un corte limpio y profesional, ideal para cualquier ocasión.
-            </p>
-            <span>$20.000</span>
-          </article>
-
-          <article className="card">
-            <h3>Barba</h3>
-            <p>
-              Perfilado y arreglo de barba con acabado preciso y elegante.
-            </p>
-            <span>$15.000</span>
-          </article>
-
-          <article className="card">
-            <h3>Corte + barba</h3>
-            <p>
-              El combo perfecto para renovar tu imagen en una sola sesión.
-            </p>
-            <span>$30.000</span>
-          </article>
-
-          <article className="card">
-            <h3>Servicio premium</h3>
-            <p>
-              Atención completa con detalles extra para una mejor experiencia.
-            </p>
-            <span>$40.000</span>
-          </article>
+          {cargandoLanding ? (
+            <p>Cargando servicios...</p>
+          ) : servicios.length > 0 ? (
+            servicios.map((servicio) => (
+              <article className="card" key={servicio.id}>
+                <img
+                  src={imagenesServicios[servicio.nombre]}
+                  alt={servicio.nombre}
+                  className="service-img"
+                />
+                <h3>{servicio.nombre}</h3>
+                <p>Duración estimada: {servicio.duracion} minutos.</p>
+                <span>${servicio.precio.toLocaleString("es-CO")}</span>
+              </article>
+            ))
+          ) : (
+            <div className="empty-state-box">
+              <h3>Sin servicios disponibles</h3>
+              <p>Muy pronto estaremos publicando nuevos servicios para ti.</p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* BARBEROS */}
       <section className="section alt-section" id="barberos">
         <div className="section-header">
           <p className="section-tag">Equipo</p>
           <h2>Nuestros barberos</h2>
           <p>
-            Luego aquí puedes poner fotos reales, nombres reales y especialidades.
+            Conoce a nuestro equipo de profesionales y elige el estilo que mejor va contigo.
           </p>
         </div>
 
         <div className="barbers">
-          <article className="barber-card">
-            <div className="barber-photo">Foto</div>
-            <h3>Juan</h3>
-            <p>Especialista en cortes clásicos</p>
-          </article>
-
-          <article className="barber-card">
-            <div className="barber-photo">Foto</div>
-            <h3>David</h3>
-            <p>Especialista en fades y estilos modernos</p>
-          </article>
-
-          <article className="barber-card">
-            <div className="barber-photo">Foto</div>
-            <h3>Andrés</h3>
-            <p>Especialista en barba y perfilado</p>
-          </article>
+          {cargandoLanding ? (
+            <p>Cargando barberos...</p>
+          ) : barberos.length > 0 ? (
+            barberos
+              .filter((barbero) => barbero.activo)
+              .map((barbero) => (
+                <article className="barber-card" key={barbero.id}>
+                  <div className="barber-photo">
+                    <img
+                      src={imagenesBarberos[barbero.nombre]}
+                      alt={barbero.nombre}
+                      className="barber-photo-img"
+                    />
+                  </div>
+                  <h3>{barbero.nombre}</h3>
+                  <p>{barbero.especialidad}</p>
+                </article>
+              ))
+          ) : (
+            <div className="empty-state-box">
+              <h3>Sin barberos disponibles</h3>
+              <p>En este momento no hay barberos activos para mostrar.</p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* AGENDA */}
       <section className="section" id="agenda">
         <div className="section-header">
           <p className="section-tag">Agenda</p>
           <h2>Reserva tu espacio</h2>
           <p>
-            Más adelante aquí podemos conectar el sistema de citas real con el backend.
+            Elige tu servicio, tu barbero favorito, la fecha y la hora que más
+            te convenga.
           </p>
         </div>
 
-        <div className="booking-box">
-          <div>
-            <h3>Agenda rápida</h3>
+        {usuario ? (
+          <AgendaForm />
+        ) : (
+          <div className="login-required-box">
+            <h3>Inicia sesión para agendar tu cita</h3>
             <p>
-              Selecciona tu servicio, el barbero y el horario disponible.
+              Para reservar un turno necesitas iniciar sesión como cliente dentro de la plataforma.
             </p>
+            <button className="btn-primary" onClick={abrirLogin}>
+              Iniciar sesión
+            </button>
           </div>
-          <button className="btn-primary">Empezar reserva</button>
-        </div>
+        )}
       </section>
 
-      {/* CONTACTO */}
       <section className="section alt-section" id="contacto">
         <div className="section-header">
           <p className="section-tag">Contacto</p>
@@ -167,7 +245,6 @@ function App() {
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="footer">
         <h3>RandallBarber</h3>
         <p>Diseñado para ofrecer estilo, comodidad y personalidad.</p>

@@ -35,9 +35,6 @@ public class BarberoDaoImpl implements BarberoDao {
 
     @Override
     public Barbero guardar(Barbero barbero) {
-        if (barbero.getActivo() == null) {
-            barbero.setActivo(true);
-        }
         return barberoRepository.save(barbero);
     }
 
@@ -47,7 +44,7 @@ public class BarberoDaoImpl implements BarberoDao {
             b.setNombre(barbero.getNombre());
             b.setEspecialidad(barbero.getEspecialidad());
             b.setTelefono(barbero.getTelefono());
-            b.setActivo(barbero.getActivo());
+            b.setActivo(barbero.isActivo());
             return barberoRepository.save(b);
         }).orElseThrow(() -> new RuntimeException("Barbero no encontrado con id: " + id));
     }

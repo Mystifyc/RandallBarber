@@ -6,6 +6,10 @@
   width: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* NAVBAR */
 .navbar {
   width: 100%;
@@ -138,25 +142,29 @@
   background-color: #f8f2fc;
 }
 
-.hero-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.hero-img {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-42%);
+  width: 82%;
+  max-width: 340px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  z-index: 2;
 }
 
 .image-card {
-  width: 100%;
+  width: 82%;
   max-width: 430px;
-  height: 480px;
-  background: linear-gradient(135deg, #111111, #7b2cbf);
+  min-height: 340px;
   border-radius: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #ffffff;
-  font-size: 1.1rem;
-  font-weight: 600;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  background: linear-gradient(135deg, #111111 0%, #7b2cbf 100%);
+  position: relative;
+  overflow: visible;
+  margin: 0 auto;
+  box-shadow: 0 18px 35px rgba(17, 17, 17, 0.18);
 }
 
 /* SECTIONS */
@@ -379,4 +387,272 @@
   .hero-buttons {
     flex-direction: column;
   }
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+}
+
+.client-session-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #ece3f7;
+  padding: 8px 10px 8px 14px;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.client-session-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.client-session-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7b2cbf;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.client-session-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 4px;
+}
+
+.client-logout-btn {
+  border: none;
+  background: linear-gradient(135deg, #7b2cbf, #5a189a);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.client-logout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(123, 44, 191, 0.22);
+}
+
+@media (max-width: 768px) {
+  .client-session-box {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .client-session-label {
+    font-size: 0.65rem;
+  }
+
+  .client-session-name {
+    font-size: 0.88rem;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .client-logout-btn {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+}
+
+.landing-booking-form {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #eadcf7;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
+  box-shadow: 0 10px 24px rgba(123, 44, 191, 0.08);
+}
+
+.landing-booking-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.landing-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landing-form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.landing-form-group select,
+.landing-form-group input {
+  height: 48px;
+  border: 1px solid #d8c7ee;
+  border-radius: 12px;
+  padding: 0 14px;
+  background-color: #ffffff;
+  color: #111111;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.landing-form-group select:focus,
+.landing-form-group input:focus {
+  border-color: #7b2cbf;
+  box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.12);
+}
+
+.landing-form-group select:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.landing-form-action {
+  justify-content: flex-end;
+}
+
+.landing-form-action .btn-primary {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+}
+
+.landing-form-helper {
+  margin: 14px 0 0;
+  font-size: 0.92rem;
+  color: #6b7280;
+}
+
+.landing-form-helper-warning {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.landing-form-message {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.landing-form-message-success {
+  background-color: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.landing-form-message-error {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 1100px) {
+  .landing-booking-grid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .landing-booking-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-booking-form {
+    padding: 18px;
+  }
+}
+
+.login-required-box {
+  margin-top: 24px;
+  padding: 28px;
+  border: 1px solid #eadcf7;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(123, 44, 191, 0.08);
+}
+
+.login-required-box h3 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+  color: #111111;
+}
+
+.login-required-box p {
+  margin: 0 0 18px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.empty-state-box {
+  width: 100%;
+  padding: 28px;
+  border: 1px solid #eadcf7;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(123, 44, 191, 0.08);
+}
+
+.empty-state-box h3 {
+  margin: 0 0 10px;
+  color: #111111;
+}
+
+.empty-state-box p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.barber-photo {
+  width: 100%;
+  height: 220px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f1ddff 0%, #e9d5ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barber-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 18px;
+  display: block;
+  background-color: #f7f0ff;
+}
+
+.service-img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 16px;
+  margin-bottom: 14px;
+  display: block;
+  background-color: #f8f4ff;
 }
