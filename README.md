@@ -1025,3 +1025,4 @@ Entre las mejoras futuras posibles están:
 - Steven Velasquez
 - Jhonatan González
 - Juan José Luquez
+- Vanesa Moscoso
