@@ -1,0 +1,360 @@
+.rb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  z-index: 99999;
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.rb-login-modal {
+  width: 80%;
+  max-width: 600px;
+  max-height: calc(100vh - 80px);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  animation: rbModalFade 0.22s ease;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+@keyframes rbModalFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rb-login-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.rb-login-tag {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7b2cbf;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.rb-login-header h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.rb-close-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #f2f2f2;
+  color: #222222;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  flex-shrink: 0;
+}
+
+.rb-close-btn:hover {
+  background: #e7e7e7;
+}
+
+.rb-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rb-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rb-login-field label {
+  font-weight: 700;
+  color: #222222;
+  font-size: 0.95rem;
+}
+
+.rb-login-field input,
+.rb-login-field select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 14px;
+  font-size: 1rem;
+  outline: none;
+  background: #ffffff;
+  color: #111111;
+  box-sizing: border-box;
+  transition: 0.2s ease;
+}
+
+.rb-login-field input:focus,
+.rb-login-field select:focus {
+  border-color: #7b2cbf;
+  box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.12);
+}
+
+.rb-login-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.rb-login-submit-btn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 14px;
+  background: #7b2cbf;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rb-login-submit-btn:hover {
+  background: #6722a1;
+}
+
+.rb-login-demo {
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f7f3fb;
+  border: 1px solid #eadcf7;
+}
+
+.rb-login-demo h4 {
+  margin: 0 0 10px 0;
+  color: #4b1f73;
+  font-size: 1rem;
+}
+
+.rb-login-demo p {
+  margin: 6px 0;
+  color: #4b1f73;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .rb-login-modal {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .rb-login-header h2 {
+    font-size: 1.6rem;
+  }
+}
+
+.rb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 2000;
+}
+
+.rb-login-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(17, 17, 17, 0.22);
+  border: 1px solid #f1e7fb;
+}
+
+.rb-login-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.rb-login-tag {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #7b2cbf;
+}
+
+.rb-login-header h2 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: #111111;
+}
+
+.rb-login-subtitle {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.55;
+  font-size: 0.96rem;
+}
+
+.rb-close-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 14px;
+  background: #f3f4f6;
+  color: #111111;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  flex-shrink: 0;
+}
+
+.rb-close-btn:hover {
+  background: #e5e7eb;
+}
+
+.rb-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rb-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rb-login-field label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111111;
+}
+
+.rb-login-field input,
+.rb-login-field select {
+  height: 50px;
+  border: 1px solid #ddd6ea;
+  border-radius: 14px;
+  padding: 0 16px;
+  font-size: 0.96rem;
+  color: #111111;
+  background: #ffffff;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.rb-login-field input:focus,
+.rb-login-field select:focus {
+  border-color: #7b2cbf;
+  box-shadow: 0 0 0 4px rgba(123, 44, 191, 0.12);
+}
+
+.rb-login-field input:disabled,
+.rb-login-field select:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.rb-login-error {
+  margin: -4px 0 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.rb-login-submit-btn {
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7b2cbf 0%, #5a189a 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+  box-shadow: 0 12px 24px rgba(123, 44, 191, 0.22);
+}
+
+.rb-login-submit-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.98;
+}
+
+.rb-login-submit-btn:disabled {
+  background: #cdb7e6;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.rb-auth-helper {
+  margin: 2px 0 0;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.rb-auth-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #7b2cbf;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.rb-auth-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .rb-modal-overlay {
+    padding: 14px;
+  }
+
+  .rb-login-modal {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .rb-login-header h2 {
+    font-size: 1.7rem;
+  }
+
+  .rb-login-subtitle {
+    font-size: 0.92rem;
+  }
+}

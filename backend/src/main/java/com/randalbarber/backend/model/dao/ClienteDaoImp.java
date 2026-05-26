@@ -1,18 +1,14 @@
 package com.randalbarber.backend.model.dao;
+
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import com.randalbarber.backend.model.entity.Cliente;
 import com.randalbarber.backend.repository.ClienteRepository;
 
-
 @Repository
-public class ClienteDaoImp implements ClienteDao{
+public class ClienteDaoImp implements ClienteDao {
 
-    @Autowired
     private final ClienteRepository clienteRepository;
 
     public ClienteDaoImp(ClienteRepository clienteRepository) {
@@ -34,11 +30,12 @@ public class ClienteDaoImp implements ClienteDao{
         return clienteRepository.save(cliente);
     }
 
+    @Override
     public Cliente actualizar(Long id, Cliente cliente) {
         return clienteRepository.findById(id).map(b -> {
             b.setNombre(cliente.getNombre());
             b.setTelefono(cliente.getTelefono());
-            b.setCorreo(cliente.getCorreo());;
+            b.setCorreo(cliente.getCorreo());
             return clienteRepository.save(b);
         }).orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + id));
     }
@@ -50,5 +47,4 @@ public class ClienteDaoImp implements ClienteDao{
         }
         clienteRepository.deleteById(id);
     }
-
 }

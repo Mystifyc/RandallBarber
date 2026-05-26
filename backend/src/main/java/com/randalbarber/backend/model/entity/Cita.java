@@ -1,8 +1,6 @@
 package com.randalbarber.backend.model.entity;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,8 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-
-
 @Entity
 @Table(name = "cita")
 public class Cita {
@@ -20,12 +16,10 @@ public class Cita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-
     private Long id;
-
     private LocalDate dia;
-
     private LocalTime hora;
+    private String estado = "ACTIVA";
 
     @ManyToOne
     @JoinColumn(name = "servicio_id")
@@ -63,6 +57,14 @@ public class Cita {
         this.hora = hora;
     }
 
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
     public Servicio getServicio() {
         return servicio;
     }
@@ -86,6 +88,4 @@ public class Cita {
     public void setBarbero(Barbero barbero) {
         this.barbero = barbero;
     }
-
-    
 }
