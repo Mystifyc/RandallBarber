@@ -15,4 +15,17 @@ export interface Notificacion {
   leida: boolean;
   fechaCreacion: string;
   rolDestino: "ADMIN" | "CLIENTE" | "BARBERO" | string;
+  clienteId?: number;
+  cita?: {
+    id?: number;
+    dia?: string;
+    hora?: string;
+    estado?: string;
+    servicio?: {
+      nombre?: string;
+    };
+    barbero?: {
+      nombre?: string;
+    };
+  };
 }

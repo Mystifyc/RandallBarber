@@ -157,6 +157,8 @@ function AgendaForm() {
         servicio: { id: Number(servicioId) },
       });
 
+      window.dispatchEvent(new Event("randallbarber:notificaciones-actualizadas"));
+
       setMensajeExito("Tu cita fue agendada correctamente.");
       setServicioId("");
       setBarberoId("");

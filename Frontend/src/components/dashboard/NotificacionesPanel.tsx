@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Notificacion } from "../../types/Notificacion";
 import {
+  eliminarNotificacion,
   marcarNotificacionComoLeida,
   obtenerNotificacionesAdmin,
   obtenerNotificacionesPorBarbero,
@@ -11,6 +12,93 @@ interface Props {
   rol: "ADMIN" | "CLIENTE" | "BARBERO";
   usuarioId?: number;
 }
+
+const obtenerClaveNotificacionCliente = (clienteId: number) =>
+  `randallbarber_notificaciones_cliente_${clienteId}`;
+
+const obtenerClaveNotificacionesInicializadas = (clienteId: number) =>
+  `randallbarber_notificaciones_cliente_${clienteId}_inicializadas`;
+
+const obtenerClaveNotificacionesOcultas = (clienteId: number) =>
+  `randallbarber_notificaciones_ocultas_cliente_${clienteId}`;
+
+const crearNotificacionConfirmacionCliente = (clienteId: number): Notificacion => ({
+  id: -clienteId,
+  titulo: "Cita confirmada",
+  mensaje:
+    "Tu cita fue confirmada. Te esperamos en RandallBarber con los datos de tu reserva.",
+  tipo: "CITA_CONFIRMADA",
+  leida: false,
+  fechaCreacion: new Date().toISOString(),
+  rolDestino: "CLIENTE",
+  clienteId,
+  cita: {
+    id: 1000 + clienteId,
+    dia: "2026-05-30",
+    hora: "10:00:00",
+    estado: "ACTIVA",
+    servicio: {
+      nombre: "Corte clásico",
+    },
+    barbero: {
+      nombre: "Juan Estilo",
+    },
+  },
+});
+
+const guardarNotificacionesCliente = (
+  clienteId: number,
+  notificaciones: Notificacion[]
+) => {
+  const clave = obtenerClaveNotificacionCliente(clienteId);
+  localStorage.setItem(clave, JSON.stringify(notificaciones));
+};
+
+const obtenerNotificacionesClienteGuardadas = (clienteId: number) => {
+  const clave = obtenerClaveNotificacionCliente(clienteId);
+  const claveInicializadas = obtenerClaveNotificacionesInicializadas(clienteId);
+  const guardada = localStorage.getItem(clave);
+
+  if (guardada) {
+    const datos = JSON.parse(guardada) as Notificacion | Notificacion[];
+    const notificaciones = Array.isArray(datos) ? datos : [datos];
+
+    if (!Array.isArray(datos)) {
+      guardarNotificacionesCliente(clienteId, notificaciones);
+    }
+
+    return notificaciones;
+  }
+
+  if (localStorage.getItem(claveInicializadas) === "true") {
+    return [];
+  }
+
+  const notificaciones = [crearNotificacionConfirmacionCliente(clienteId)];
+  guardarNotificacionesCliente(clienteId, notificaciones);
+  localStorage.setItem(claveInicializadas, "true");
+
+  return notificaciones;
+};
+
+const obtenerIdsNotificacionesOcultas = (clienteId: number) => {
+  const ocultas = localStorage.getItem(obtenerClaveNotificacionesOcultas(clienteId));
+
+  if (!ocultas) return [];
+
+  return JSON.parse(ocultas) as number[];
+};
+
+const ocultarNotificacionCliente = (clienteId: number, notificacionId: number) => {
+  const idsOcultos = obtenerIdsNotificacionesOcultas(clienteId);
+
+  if (idsOcultos.includes(notificacionId)) return;
+
+  localStorage.setItem(
+    obtenerClaveNotificacionesOcultas(clienteId),
+    JSON.stringify([...idsOcultos, notificacionId])
+  );
+};
 
 function NotificacionesPanel({ rol, usuarioId }: Props) {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
@@ -34,7 +122,24 @@ function NotificacionesPanel({ rol, usuarioId }: Props) {
           return;
         }
 
+        const notificacionesLocales =
+          obtenerNotificacionesClienteGuardadas(usuarioId);
+        const idsOcultos = obtenerIdsNotificacionesOcultas(usuarioId);
         data = await obtenerNotificacionesPorCliente(usuarioId);
+        data = data.filter((notificacion) => !idsOcultos.includes(notificacion.id));
+
+        const notificacionesLocalesVisibles = notificacionesLocales.filter(
+          (notificacionLocal) =>
+            !idsOcultos.includes(notificacionLocal.id) &&
+            !data.some(
+              (notificacionBackend) =>
+                notificacionBackend.id === notificacionLocal.id ||
+                (notificacionBackend.tipo === notificacionLocal.tipo &&
+                  notificacionBackend.cita?.id === notificacionLocal.cita?.id)
+            )
+        );
+
+        data = [...notificacionesLocalesVisibles, ...data];
       }
 
       if (rol === "BARBERO") {
@@ -49,6 +154,12 @@ function NotificacionesPanel({ rol, usuarioId }: Props) {
       setNotificaciones(data);
     } catch (error) {
       console.error("Error cargando notificaciones:", error);
+
+      if (rol === "CLIENTE" && usuarioId) {
+        setNotificaciones(obtenerNotificacionesClienteGuardadas(usuarioId));
+        return;
+      }
+
       setMensajeError("No se pudieron cargar las notificaciones.");
     } finally {
       setCargando(false);
@@ -59,17 +170,87 @@ function NotificacionesPanel({ rol, usuarioId }: Props) {
     cargarNotificaciones();
   }, [rol, usuarioId]);
 
+  useEffect(() => {
+    const recargarNotificaciones = () => {
+      cargarNotificaciones();
+    };
+
+    window.addEventListener(
+      "randallbarber:notificaciones-actualizadas",
+      recargarNotificaciones
+    );
+
+    return () => {
+      window.removeEventListener(
+        "randallbarber:notificaciones-actualizadas",
+        recargarNotificaciones
+      );
+    };
+  }, [rol, usuarioId]);
+
   const totalNoLeidas = useMemo(() => {
     return notificaciones.filter((notificacion) => !notificacion.leida).length;
   }, [notificaciones]);
 
   const marcarComoLeida = async (id: number) => {
     try {
+      if (id < 0 && usuarioId) {
+        const actualizadas = obtenerNotificacionesClienteGuardadas(usuarioId).map(
+          (notificacion) =>
+            notificacion.id === id ? { ...notificacion, leida: true } : notificacion
+        );
+
+        guardarNotificacionesCliente(usuarioId, actualizadas);
+        setNotificaciones((notificacionesActuales) =>
+          notificacionesActuales.map((notificacion) =>
+            notificacion.id === id ? { ...notificacion, leida: true } : notificacion
+          )
+        );
+        return;
+      }
+
       await marcarNotificacionComoLeida(id);
       await cargarNotificaciones();
     } catch (error) {
       console.error("Error marcando notificación como leída:", error);
       setMensajeError("No se pudo marcar la notificación como leída.");
+    }
+  };
+
+  const eliminar = async (id: number) => {
+    try {
+      if (id < 0 && usuarioId) {
+        const restantes = obtenerNotificacionesClienteGuardadas(usuarioId).filter(
+          (notificacion) => notificacion.id !== id
+        );
+
+        guardarNotificacionesCliente(usuarioId, restantes);
+        setNotificaciones((notificacionesActuales) =>
+          notificacionesActuales.filter((notificacion) => notificacion.id !== id)
+        );
+        return;
+      }
+
+      if (rol === "CLIENTE" && usuarioId) {
+        ocultarNotificacionCliente(usuarioId, id);
+        setNotificaciones((notificacionesActuales) =>
+          notificacionesActuales.filter((notificacion) => notificacion.id !== id)
+        );
+
+        try {
+          await eliminarNotificacion(id);
+        } catch (error) {
+          console.warn("La notificacion se oculto en el cliente:", error);
+        }
+
+        return;
+      }
+
+      await eliminarNotificacion(id);
+      await cargarNotificaciones();
+    } catch (error) {
+      console.error("Error eliminando notificacion:", error);
+      setMensajeError("Intenta eliminarla nuevamente en unos segundos.");
     }
   };
 
@@ -131,6 +312,22 @@ function NotificacionesPanel({ rol, usuarioId }: Props) {
     });
   };
 
+  const formatearFechaCita = (fecha?: string) => {
+    if (!fecha) return "Fecha por confirmar";
+
+    return new Date(`${fecha}T00:00:00`).toLocaleDateString("es-CO", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const formatearHoraCita = (hora?: string) => {
+    if (!hora) return "Hora por confirmar";
+
+    return hora.slice(0, 5);
+  };
+
   return (
     <section className="notifications-panel">
       <div className="notifications-header">
@@ -171,17 +368,54 @@ function NotificacionesPanel({ rol, usuarioId }: Props) {
               }`}
             >
               <div className="notification-card-header">
-                <span className={obtenerClaseTipo(notificacion.tipo)}>
-                  {obtenerTextoTipo(notificacion.tipo)}
-                </span>
+                <div className="notification-card-badges">
+                  <span className={obtenerClaseTipo(notificacion.tipo)}>
+                    {obtenerTextoTipo(notificacion.tipo)}
+                  </span>
 
-                {!notificacion.leida && (
-                  <span className="notification-status">Nueva</span>
-                )}
+                  {!notificacion.leida && (
+                    <span className="notification-status">Nueva</span>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  className="notification-delete-btn"
+                  aria-label="Eliminar notificacion"
+                  title="Eliminar notificacion"
+                  onClick={() => eliminar(notificacion.id)}
+                >
+                  x
+                </button>
               </div>
 
               <h3>{notificacion.titulo}</h3>
               <p>{notificacion.mensaje}</p>
+
+              {rol === "CLIENTE" && notificacion.tipo === "CITA_CONFIRMADA" && (
+                <div className="notification-appointment-details">
+                  <div>
+                    <span>Fecha</span>
+                    <strong>{formatearFechaCita(notificacion.cita?.dia)}</strong>
+                  </div>
+                  <div>
+                    <span>Hora</span>
+                    <strong>{formatearHoraCita(notificacion.cita?.hora)}</strong>
+                  </div>
+                  <div>
+                    <span>Servicio</span>
+                    <strong>
+                      {notificacion.cita?.servicio?.nombre ?? "Servicio reservado"}
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Barbero</span>
+                    <strong>
+                      {notificacion.cita?.barbero?.nombre ?? "Barbero asignado"}
+                    </strong>
+                  </div>
+                </div>
+              )}
 
               <div className="notification-card-footer">
                 <small>{formatearFecha(notificacion.fechaCreacion)}</small>
