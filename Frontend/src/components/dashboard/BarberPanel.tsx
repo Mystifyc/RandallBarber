@@ -6,10 +6,11 @@ import { obtenerClientes, type Cliente } from "../../api/clientesApi";
 import { obtenerServicios, type Servicio } from "../../api/serviciosApi";
 import { obtenerBarberos, type Barbero } from "../../api/barberosApi";
 
-type BarberSection = "inicio" | "citas" | "perfil";
+type BarberSection = "inicio" | "citas" | "notificaciones" | "perfil";
 
 function BarberPanel() {
   const { usuario } = useAuth();
+
   const [seccionActiva, setSeccionActiva] = useState<BarberSection>("inicio");
   const [citas, setCitas] = useState<Cita[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -83,24 +84,44 @@ function BarberPanel() {
   };
 
   const formatearFecha = (fecha: string) => {
-  return new Date(`${fecha}T00:00:00`).toLocaleDateString("es-CO", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
+    return new Date(`${fecha}T00:00:00`).toLocaleDateString("es-CO", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   const formatearHora = (hora: string) => {
     return hora.slice(0, 5);
   };
 
   const renderContenido = () => {
+    if (seccionActiva === "notificaciones") {
+      return usuario ? (
+        <>
+          <div className="panel-topbar">
+            <div>
+              <p className="panel-tag">Notificaciones</p>
+              <h1>Mis notificaciones</h1>
+              <p className="panel-subtitle">
+                Aquí puedes revisar nuevas citas asignadas, cambios y cancelaciones de tu agenda.
+              </p>
+            </div>
+
+            <div className="panel-user-box">
+              <span className="panel-user-role">BARBERO</span>
+              <span className="panel-user-name">{usuario.nombre}</span>
+            </div>
+          </div>
+
+          <NotificacionesPanel rol="BARBERO" usuarioId={usuario.id} />
+        </>
+      ) : null;
+    }
+
     if (seccionActiva === "citas") {
       return (
         <>
-        {usuario && usuario.rol === "BARBERO" && (
-          <NotificacionesPanel rol="BARBERO" usuarioId={usuario.id} />
-        )}
           <div className="panel-topbar">
             <div>
               <p className="panel-tag">Agenda</p>
@@ -131,13 +152,17 @@ function BarberPanel() {
                 citasDelBarbero.map((cita) => (
                   <div className="appointment-row" key={cita.id}>
                     <div>
-                      <strong>{formatearFecha(cita.dia)} - {formatearHora(cita.hora)}</strong>
+                      <strong>
+                        {formatearFecha(cita.dia)} - {formatearHora(cita.hora)}
+                      </strong>
                       <p>{obtenerNombreServicio(cita.servicio.id)}</p>
                     </div>
+
                     <div>
                       <strong>Cliente</strong>
                       <p>{obtenerNombreCliente(cita.cliente.id)}</p>
                     </div>
+
                     <div>
                       <strong>Estado</strong>
                       <span className="status-badge confirmed">Agendada</span>
@@ -184,10 +209,12 @@ function BarberPanel() {
                   <span>Correo</span>
                   <strong>{usuario?.correo}</strong>
                 </div>
+
                 <div className="info-item">
                   <span>Estado</span>
                   <strong>Activo</strong>
                 </div>
+
                 <div className="info-item">
                   <span>Horario</span>
                   <strong>9:00 AM - 8:00 PM</strong>
@@ -257,7 +284,8 @@ function BarberPanel() {
             <p className="stat-label">Próxima cita</p>
             <h3>{proximaCita ? formatearHora(proximaCita.hora) : "--:--"}</h3>
             <span className="stat-help">
-              Cliente: {proximaCita ? obtenerNombreCliente(proximaCita.cliente.id) : "Sin citas"}
+              Cliente:{" "}
+              {proximaCita ? obtenerNombreCliente(proximaCita.cliente.id) : "Sin citas"}
             </span>
           </article>
 
@@ -275,6 +303,7 @@ function BarberPanel() {
                 <p className="mini-tag">Agenda</p>
                 <h2>Citas del día</h2>
               </div>
+
               <button className="ghost-btn" onClick={() => setSeccionActiva("citas")}>
                 Ver agenda completa
               </button>
@@ -290,10 +319,12 @@ function BarberPanel() {
                       <strong>{formatearHora(cita.hora)}</strong>
                       <p>{obtenerNombreServicio(cita.servicio.id)}</p>
                     </div>
+
                     <div>
                       <strong>Cliente</strong>
                       <p>{obtenerNombreCliente(cita.cliente.id)}</p>
                     </div>
+
                     <div>
                       <strong>Estado</strong>
                       <span className="status-badge confirmed">Agendada</span>
@@ -325,10 +356,12 @@ function BarberPanel() {
                 <span>Estado</span>
                 <strong>Activo</strong>
               </div>
+
               <div className="info-item">
                 <span>Horario</span>
                 <strong>9:00 AM - 8:00 PM</strong>
               </div>
+
               <div className="info-item">
                 <span>Total de citas</span>
                 <strong>{citasDelBarbero.length}</strong>
@@ -345,6 +378,7 @@ function BarberPanel() {
                 <h2>Siguientes reservas</h2>
               </div>
             </div>
+
             <ul className="simple-list">
               {cargandoDatos ? (
                 <li>Cargando próximas reservas...</li>
@@ -358,9 +392,12 @@ function BarberPanel() {
                   .slice(0, 3)
                   .map((cita) => (
                     <li key={cita.id}>
-                      <strong>{cita.dia} - {formatearHora(cita.hora)}</strong>
+                      <strong>
+                        {cita.dia} - {formatearHora(cita.hora)}
+                      </strong>
                       <span>
-                        {obtenerNombreServicio(cita.servicio.id)} - {obtenerNombreCliente(cita.cliente.id)}
+                        {obtenerNombreServicio(cita.servicio.id)} -{" "}
+                        {obtenerNombreCliente(cita.cliente.id)}
                       </span>
                     </li>
                   ))
@@ -382,9 +419,18 @@ function BarberPanel() {
               <button className="action-btn" onClick={() => setSeccionActiva("citas")}>
                 Ver citas
               </button>
+
               <button className="action-btn" onClick={() => setSeccionActiva("inicio")}>
                 Actualizar disponibilidad
               </button>
+
+              <button
+                className="action-btn"
+                onClick={() => setSeccionActiva("notificaciones")}
+              >
+                Ver notificaciones
+              </button>
+
               <button className="action-btn" onClick={() => setSeccionActiva("perfil")}>
                 Editar perfil
               </button>
@@ -404,12 +450,23 @@ function BarberPanel() {
         >
           Inicio
         </button>
+
         <button
           className={seccionActiva === "citas" ? "toolbar-btn active" : "toolbar-btn"}
           onClick={() => setSeccionActiva("citas")}
         >
           Citas
         </button>
+
+        <button
+          className={
+            seccionActiva === "notificaciones" ? "toolbar-btn active" : "toolbar-btn"
+          }
+          onClick={() => setSeccionActiva("notificaciones")}
+        >
+          Notificaciones
+        </button>
+
         <button
           className={seccionActiva === "perfil" ? "toolbar-btn active" : "toolbar-btn"}
           onClick={() => setSeccionActiva("perfil")}
