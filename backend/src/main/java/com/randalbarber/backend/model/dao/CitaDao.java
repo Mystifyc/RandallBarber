@@ -22,4 +22,6 @@ public interface CitaDao {
     List<LocalTime> obtenerHorasDisponibles(Long barberoId, LocalDate dia);
 
     List<Cita> obtenerCitasPorBarberoYDia(Long barberoId, LocalDate dia);
+
+    List<Cita> filtrarCitas(Long clienteId, Long barberoId, LocalDate dia);
 }

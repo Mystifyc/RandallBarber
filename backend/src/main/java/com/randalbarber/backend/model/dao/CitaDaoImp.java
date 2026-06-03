@@ -279,4 +279,9 @@ public class CitaDaoImp implements CitaDao {
                 "ADMIN"
         );
     }
+
+    @Override
+    public List<Cita> filtrarCitas(Long clienteId, Long barberoId, LocalDate dia) {
+        return citaRepository.filtrarCitas(clienteId, barberoId, dia);
+    }
 }
