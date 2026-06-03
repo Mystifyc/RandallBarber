@@ -271,6 +271,21 @@ public class CitaDaoImp implements CitaDao {
         return citaRepository.findByBarberoIdAndDia(barberoId, dia);
     }
 
+    @Override
+    public List<Cita> obtenerHistorialPorCliente(Long clienteId) {
+        if (clienteId == null) {
+            throw new RuntimeException("El id del cliente es obligatorio");
+        }
+
+        boolean existeCliente = clienteRepository.existsById(clienteId);
+
+        if (!existeCliente) {
+            throw new RuntimeException("Cliente no encontrado");
+        }
+
+        return citaRepository.buscarHistorialPorCliente(clienteId);
+    }
+
     private void crearNotificacionAdmin(String titulo, String mensaje, String tipo) {
         notificacionDao.crearNotificacion(
                 titulo,

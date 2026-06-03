@@ -8,6 +8,7 @@ import { obtenerBarberos, type Barbero } from "./api/barberosApi";
 import { obtenerServicios, type Servicio } from "./api/serviciosApi";
 import heroBarber from "./assets/hero-barber.png";
 import NotificacionesPanel from "./components/dashboard/NotificacionesPanel";
+import HistorialCitasCliente from "./components/HistorialCitasCliente";
 import barberoJuan from "./assets/barbero-juan.png";
 import barberoCarlos from "./assets/barbero-carlos.png";
 import barberoMateo from "./assets/barbero-mateo.png";
@@ -79,7 +80,10 @@ function App() {
           <a href="#barberos">Barberos</a>
           <a href="#agenda">Agenda</a>
           {usuario?.rol === "CLIENTE" && (
-            <a href="#notificaciones">Notificaciones</a>
+            <>
+              <a href="#historial">Historial</a>
+              <a href="#notificaciones">Notificaciones</a>
+            </>
           )}
           <a href="#contacto">Contacto</a>
         </nav>
@@ -224,11 +228,27 @@ function App() {
           </div>
         )}
       </section>
-        {usuario?.rol === "CLIENTE" && (
-          <section className="section alt-section" id="notificaciones">
+
+      {usuario?.rol === "CLIENTE" && (
+        <section className="section alt-section" id="historial">
+          <div className="section-header">
+            <p className="section-tag">Historial</p>
+            <h2>Mis citas reservadas</h2>
+            <p>
+              Consulta las citas que has reservado anteriormente en RandallBarber.
+            </p>
+          </div>
+
+          <HistorialCitasCliente />
+        </section>
+      )}
+
+      {usuario?.rol === "CLIENTE" && (
+        <section className="section" id="notificaciones">
           <NotificacionesPanel rol="CLIENTE" usuarioId={usuario.id} />
         </section>
-        )}
+      )}
+
       <section className="section alt-section" id="contacto">
         <div className="section-header">
           <p className="section-tag">Contacto</p>

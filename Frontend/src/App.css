@@ -943,3 +943,76 @@ html {
     justify-content: flex-start;
   }
 }
+
+.historial-card {
+  max-width: 950px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+.historial-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.historial-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.historial-table th,
+.historial-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.historial-table th {
+  color: #111111;
+  font-weight: 800;
+  background-color: #f8f2fc;
+}
+
+.historial-table td {
+  color: #444444;
+}
+
+.historial-status {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.historial-status.active {
+  background-color: #e8f7ee;
+  color: #16803c;
+}
+
+.historial-status.cancelled {
+  background-color: #fdecec;
+  color: #c62828;
+}
+
+.historial-empty {
+  text-align: center;
+}
+
+.historial-empty h3 {
+  color: #111111;
+  margin-bottom: 10px;
+}
+
+.historial-empty p {
+  color: #666666;
+}
+
+.historial-error {
+  color: #c62828;
+  font-weight: 600;
+}

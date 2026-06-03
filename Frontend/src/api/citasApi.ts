@@ -29,6 +29,14 @@ export interface ActualizarCitaDto {
   servicio: ReferenciaEntidad;
 }
 
+export interface HistorialCitaCliente {
+  id: number;
+  dia: string;
+  hora: string;
+  servicio: string;
+  estado: string;
+}
+
 export const obtenerCitas = async (): Promise<Cita[]> => {
   const response = await api.get<Cita[]>("/citas");
   return response.data;
@@ -66,5 +74,15 @@ export const obtenerHorasDisponibles = async (
       dia,
     },
   });
+  return response.data;
+};
+
+export const obtenerHistorialCitasCliente = async (
+  clienteId: number
+): Promise<HistorialCitaCliente[]> => {
+  const response = await api.get<HistorialCitaCliente[]>(
+    `/citas/cliente/${clienteId}/historial`
+  );
+
   return response.data;
 };

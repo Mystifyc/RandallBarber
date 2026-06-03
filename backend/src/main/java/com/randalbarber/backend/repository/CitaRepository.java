@@ -63,4 +63,15 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("dia") LocalDate dia
     );
     
+
+
+    @Query("""
+            SELECT c
+            FROM Cita c
+            WHERE c.cliente.id = :clienteId
+            ORDER BY c.dia DESC, c.hora DESC
+            """)
+    List<Cita> buscarHistorialPorCliente(
+            @Param("clienteId") Long clienteId
+    );
 }

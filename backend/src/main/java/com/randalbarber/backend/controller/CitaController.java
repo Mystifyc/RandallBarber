@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.randalbarber.backend.controller.dto.HistorialCitaClienteResponse;
 import com.randalbarber.backend.model.dao.CitaDao;
 import com.randalbarber.backend.model.entity.Cita;
 
@@ -39,6 +40,26 @@ public class CitaController {
     public ResponseEntity<Cita> guardaCi(@RequestBody Cita cita) {
         Cita nuevo = citaDao.guardarCita(cita);
         return ResponseEntity.ok(nuevo);
+    }
+
+    @GetMapping("/cliente/{clienteId}/historial")
+    public ResponseEntity<?> obtenerHistorialCliente(@PathVariable Long clienteId) {
+        try {
+            List<HistorialCitaClienteResponse> historial = citaDao.obtenerHistorialPorCliente(clienteId)
+                    .stream()
+                    .map(cita -> new HistorialCitaClienteResponse(
+                            cita.getId(),
+                            cita.getDia(),
+                            cita.getHora(),
+                            cita.getServicio() != null ? cita.getServicio().getNombre() : "Sin servicio",
+                            cita.getEstado()
+                    ))
+                    .toList();
+
+            return ResponseEntity.ok(historial);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/disponibles")
