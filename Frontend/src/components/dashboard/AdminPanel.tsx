@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/Authcontext";
 import NotificacionesPanel from "./NotificacionesPanel";
-import {obtenerCitas, obtenerHorasDisponibles, crearCita, actualizarCita, eliminarCita, type Cita } from "../../api/citasApi";
+import {obtenerCitas, obtenerHorasDisponibles, crearCita, actualizarCita, eliminarCita, filtrarCitas, obtenerCitasCanceladas, type Cita } from "../../api/citasApi";
 import { obtenerBarberos, type Barbero } from "../../api/barberosApi";
 import { obtenerServicios, type Servicio } from "../../api/serviciosApi";
 import { obtenerClientes, type Cliente } from "../../api/clientesApi";
@@ -10,6 +10,7 @@ import { obtenerClientes, type Cliente } from "../../api/clientesApi";
 type AdminSection =
   | "inicio"
   | "citas"
+  | "canceladas"
   | "notificaciones"
   | "perfil"
   | "servicios"
@@ -38,28 +39,40 @@ function AdminPanel() {
   const [mensajeError, setMensajeError] = useState("");
 
   const [citaEditandoId, setCitaEditandoId] = useState<number | null>(null);
+  const [filtroClienteId, setFiltroClienteId] = useState("");
+  const [filtroBarberoId, setFiltroBarberoId] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState("");
+  const [aplicandoFiltros, setAplicandoFiltros] = useState(false);
+
+  const [citasCanceladas, setCitasCanceladas] = useState<Cita[]>([]);
+  const [cargandoCanceladas, setCargandoCanceladas] = useState(false);
+  const [ordenCanceladas, setOrdenCanceladas] = useState<"DESC" | "ASC">("DESC");
 
   const cargarDatos = async () => {
     try {
       setCargandoCitas(true);
+      setCargandoCanceladas(true);
 
-      const [citasData, barberosData, serviciosData, clientesData] =
-        await Promise.all([
-          obtenerCitas(),
-          obtenerBarberos(),
-          obtenerServicios(),
-          obtenerClientes(),
-        ]);
+      const [ citasData, barberosData, serviciosData, clientesData, canceladasData,]
+       = await Promise.all([
+        obtenerCitas(),
+        obtenerBarberos(),
+        obtenerServicios(),
+        obtenerClientes(),
+        obtenerCitasCanceladas(),
+      ]);
 
       setCitas(citasData);
       setBarberos(barberosData);
       setServicios(serviciosData);
       setClientes(clientesData);
+      setCitasCanceladas(canceladasData);
     } catch (error) {
       console.error("Error cargando datos del panel:", error);
       setMensajeError("No se pudieron cargar los datos del panel.");
     } finally {
       setCargandoCitas(false);
+      setCargandoCanceladas(false);
     }
   };
 
@@ -218,6 +231,60 @@ function AdminPanel() {
       setMensajeError("No se pudo eliminar la cita.");
     }
   };
+
+  const manejarFiltrarCitas = async (e: FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setAplicandoFiltros(true);
+      setMensajeError("");
+      setMensajeExito("");
+
+      const filtros = {
+        clienteId: filtroClienteId ? Number(filtroClienteId) : undefined,
+        barberoId: filtroBarberoId ? Number(filtroBarberoId) : undefined,
+        dia: filtroFecha || undefined,
+      };
+
+      const resultado = await filtrarCitas(filtros);
+      setCitas(resultado);
+
+      if (resultado.length === 0) {
+        setMensajeError("No se encontraron citas con los filtros seleccionados.");
+      } else {
+        setMensajeExito("Filtro aplicado correctamente.");
+      }
+    } catch (error) {
+      console.error("Error filtrando citas:", error);
+      setMensajeError("No se pudieron filtrar las citas.");
+    } finally {
+      setAplicandoFiltros(false);
+    }
+  };
+
+  const limpiarFiltrosCitas = async () => {
+    setFiltroClienteId("");
+    setFiltroBarberoId("");
+    setFiltroFecha("");
+    setMensajeError("");
+    setMensajeExito("");
+
+    const citasData = await obtenerCitas();
+    setCitas(citasData);
+  };
+
+  const citasCanceladasOrdenadas = useMemo(() => {
+    return [...citasCanceladas].sort((a, b) => {
+      const fechaA = `${a.dia}T${a.hora}`;
+      const fechaB = `${b.dia}T${b.hora}`;
+
+      if (ordenCanceladas === "DESC") {
+        return fechaB.localeCompare(fechaA);
+      }
+
+      return fechaA.localeCompare(fechaB);
+    });
+  }, [citasCanceladas, ordenCanceladas]);
 
   const formatearFecha = (fecha: string) => {
     return new Date(`${fecha}T00:00:00`).toLocaleDateString("es-CO", {
@@ -407,6 +474,74 @@ function AdminPanel() {
               )}
             </form>
 
+            <form className="appointment-form" onSubmit={manejarFiltrarCitas}>
+              <div className="appointment-form-header">
+                <div>
+                  <p className="mini-tag">Filtros</p>
+                  <h3>Filtrar citas</h3>
+                </div>
+                <p className="appointment-form-text">
+                  Puedes filtrar las citas por cliente, barbero, fecha o combinar varios
+                  filtros al mismo tiempo.
+                </p>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Cliente</label>
+                  <select
+                    value={filtroClienteId}
+                    onChange={(e) => setFiltroClienteId(e.target.value)}
+                  >
+                    <option value="">Todos los clientes</option>
+                    {clientes.map((cliente) => (
+                      <option key={cliente.id} value={cliente.id}>
+                        {cliente.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Barbero</label>
+                  <select
+                    value={filtroBarberoId}
+                    onChange={(e) => setFiltroBarberoId(e.target.value)}
+                  >
+                    <option value="">Todos los barberos</option>
+                    {barberos.map((barbero) => (
+                      <option key={barbero.id} value={barbero.id}>
+                        {barbero.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Fecha</label>
+                  <input
+                    type="date"
+                    value={filtroFecha}
+                    onChange={(e) => setFiltroFecha(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group form-action">
+                  <label>&nbsp;</label>
+                  <button type="submit" disabled={aplicandoFiltros}>
+                    {aplicandoFiltros ? "Filtrando..." : "Aplicar filtros"}
+                  </button>
+                </div>
+
+                <div className="form-group form-action">
+                  <label>&nbsp;</label>
+                  <button type="button" onClick={limpiarFiltrosCitas}>
+                    Limpiar filtros
+                  </button>
+                </div>
+              </div>
+            </form>
+
             <div className="appointments-table">
               {cargandoCitas ? (
                 <p>Cargando citas...</p>
@@ -455,6 +590,87 @@ function AdminPanel() {
                 <div className="empty-panel-state">
                   <h3>No hay citas registradas</h3>
                   <p>Cuando empieces a crear reservas, aparecerán aquí.</p>
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      );
+    }
+
+    if (seccionActiva === "canceladas") {
+      return (
+        <>
+          <div className="panel-topbar">
+            <div>
+              <p className="panel-tag">Citas canceladas</p>
+              <h1>Historial de cancelaciones</h1>
+              <p className="panel-subtitle">
+                Aquí puedes consultar las citas que fueron canceladas para analizar
+                problemas de asistencia.
+              </p>
+            </div>
+
+            <div className="panel-user-box">
+              <span className="panel-user-role">ADMIN</span>
+              <span className="panel-user-name">{usuario?.nombre}</span>
+            </div>
+          </div>
+
+          <section className="panel-card">
+            <div className="card-header card-header-stack">
+              <div>
+                <p className="mini-tag">Cancelaciones</p>
+                <h2>Citas canceladas</h2>
+              </div>
+
+              <div className="form-group">
+                <label>Ordenar resultados</label>
+                <select
+                  value={ordenCanceladas}
+                  onChange={(e) =>
+                    setOrdenCanceladas(e.target.value as "DESC" | "ASC")
+                  }
+                >
+                  <option value="DESC">Más recientes primero</option>
+                  <option value="ASC">Más antiguas primero</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="appointments-table">
+              {cargandoCanceladas ? (
+                <p>Cargando citas canceladas...</p>
+              ) : citasCanceladasOrdenadas.length > 0 ? (
+                citasCanceladasOrdenadas.map((cita) => (
+                  <div className="appointment-row" key={cita.id}>
+                    <div>
+                      <strong>
+                        {formatearFecha(cita.dia)} - {formatearHora(cita.hora)}
+                      </strong>
+                      <p>{obtenerNombreServicio(cita.servicio.id)}</p>
+                    </div>
+
+                    <div>
+                      <strong>Cliente</strong>
+                      <p>{obtenerNombreCliente(cita.cliente.id)}</p>
+                    </div>
+
+                    <div>
+                      <strong>Barbero</strong>
+                      <p>{obtenerNombreBarbero(cita.barbero.id)}</p>
+                    </div>
+
+                    <div>
+                      <strong>Estado</strong>
+                      <span className="status-badge pending">Cancelada</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-panel-state">
+                  <h3>No hay citas canceladas</h3>
+                  <p>Cuando se cancele una cita, aparecerá en este historial.</p>
                 </div>
               )}
             </div>
@@ -809,6 +1025,14 @@ function AdminPanel() {
           onClick={() => setSeccionActiva("citas")}
         >
           Citas
+        </button>
+        <button
+          className={
+            seccionActiva === "canceladas" ? "toolbar-btn active" : "toolbar-btn"
+          }
+          onClick={() => setSeccionActiva("canceladas")}
+        >
+          Canceladas
         </button>
         <button
           className={

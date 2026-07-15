@@ -1016,3 +1016,266 @@ html {
   color: #c62828;
   font-weight: 600;
 }
+
+.historial-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.historial-filter-bar h3 {
+  margin: 0 0 6px;
+  color: #111111;
+}
+
+.historial-filter-bar p {
+  margin: 0;
+  color: #666666;
+}
+
+.historial-filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.historial-filter-actions select,
+.historial-filter-actions button {
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.historial-filter-actions button {
+  background-color: #111111;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.historial-status.completed {
+  background-color: #f0e7ff;
+  color: #6b21a8;
+}
+
+.historial-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.historial-filter-bar h3 {
+  margin: 0 0 6px;
+  color: #111111;
+}
+
+.historial-filter-bar p {
+  margin: 0;
+  color: #666666;
+}
+
+.historial-filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.historial-filter-actions select,
+.historial-filter-actions button {
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.historial-filter-actions button {
+  background-color: #111111;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.historial-status.completed {
+  background-color: #f0e7ff;
+  color: #6b21a8;
+}
+
+.historial-success {
+  background-color: #ecfdf3;
+  color: #027a48;
+  border: 1px solid #abefc6;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.historial-edit-form {
+  border: 1px solid #eadcff;
+  background-color: #fbf8ff;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.historial-edit-form h3 {
+  margin: 0 0 16px;
+}
+
+.historial-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.historial-edit-grid label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.historial-edit-grid select,
+.historial-edit-grid input {
+  width: 100%;
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.historial-edit-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.historial-edit-actions button,
+.historial-actions button {
+  border: none;
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-weight: 800;
+  cursor: pointer;
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.historial-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.historial-actions button.danger {
+  background-color: #b42318;
+}
+
+.historial-no-actions {
+  color: #999999;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .historial-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .historial-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .historial-actions {
+    flex-direction: column;
+  }
+}
+
+.historial-success {
+  background-color: #ecfdf3;
+  color: #027a48;
+  border: 1px solid #abefc6;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.historial-edit-form {
+  border: 1px solid #eadcff;
+  background-color: #fbf8ff;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.historial-edit-form h3 {
+  margin: 0 0 16px;
+}
+
+.historial-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.historial-edit-grid label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.historial-edit-grid select,
+.historial-edit-grid input {
+  width: 100%;
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.historial-edit-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.historial-edit-actions button,
+.historial-actions button {
+  border: none;
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-weight: 800;
+  cursor: pointer;
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.historial-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.historial-actions button.danger {
+  background-color: #b42318;
+}
+
+.historial-no-actions {
+  color: #999999;
+  font-size: 0.85rem;
+}
+
+.historial-status.completed {
+  background-color: #f0e7ff;
+  color: #6b21a8;
+}
+
+@media (max-width: 900px) {
+  .historial-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .historial-actions {
+    flex-direction: column;
+  }
+}

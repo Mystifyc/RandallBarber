@@ -40,7 +40,7 @@ public class CitaDaoImp implements CitaDao {
 
     @Override
     public List<Cita> listarCitas() {
-        return citaRepository.findAll();
+        return citaRepository.findByEstadoOrderByDiaAscHoraAsc("ACTIVA");
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CitaDaoImp implements CitaDao {
         nuevaCita.setEstado("ACTIVA");
 
         Cita citaGuardada = citaRepository.save(nuevaCita);
-
+        
         crearNotificacionAdmin(
                 "Nueva cita registrada",
                 "Se creó una cita para el cliente " + cliente.getNombre()
@@ -132,7 +132,7 @@ public class CitaDaoImp implements CitaDao {
                 + ".",
         "CITA_CREADA",
         citaGuardada
-        );
+        );  
 
         return citaGuardada;
     }
@@ -185,7 +185,22 @@ public class CitaDaoImp implements CitaDao {
 
             if (cambioDia || cambioHora || cambioCliente || cambioBarbero || cambioServicio) {
                 notificacionDao.generarNotificacionCitaModificada(citaActualizada);
-                }
+
+                notificacionDao.crearNotificacionBarbero(
+                        "Cita modificada",
+                        "La cita con el cliente "
+                                + cliente.getNombre()
+                                + " fue modificada. Nueva información: "
+                                + citaActualizada.getDia()
+                                + " a las "
+                                + citaActualizada.getHora()
+                                + ". Servicio: "
+                                + servicio.getNombre()
+                                + ".",
+                        "CITA_MODIFICADA",
+                        citaActualizada
+                );
+            }
 
             crearNotificacionAdmin(
                     "Cita actualizada",
@@ -225,6 +240,21 @@ public class CitaDaoImp implements CitaDao {
         );
 
         notificacionDao.generarNotificacionCitaCancelada(citaCancelada);
+
+        notificacionDao.crearNotificacionBarbero(
+        "Cita cancelada",
+        "La cita con el cliente "
+                + nombreCliente
+                + " programada para el día "
+                + citaCancelada.getDia()
+                + " a las "
+                + citaCancelada.getHora()
+                + " fue cancelada. Servicio: "
+                + nombreServicio
+                + ".",
+        "CITA_CANCELADA",
+        citaCancelada
+        );
     }
 
         @Override
@@ -286,6 +316,43 @@ public class CitaDaoImp implements CitaDao {
         return citaRepository.buscarHistorialPorCliente(clienteId);
     }
 
+    @Override
+    public List<Cita> obtenerHistorialPorBarbero(Long barberoId) {
+        if (barberoId == null) {
+            throw new RuntimeException("El id del barbero es obligatorio");
+        }
+
+        boolean existeBarbero = barberoRepository.existsById(barberoId);
+
+        if (!existeBarbero) {
+            throw new RuntimeException("Barbero no encontrado");
+        }
+
+        return citaRepository.buscarHistorialPorBarbero(
+                barberoId,
+                LocalDate.now(),
+                LocalTime.now()
+        );
+    }
+
+    @Override
+    public List<Cita> obtenerCitasActivasPorCliente(Long clienteId) {
+        if (clienteId == null) {
+            throw new RuntimeException("El id del cliente es obligatorio");
+        }
+
+        boolean existeCliente = clienteRepository.existsById(clienteId);
+
+        if (!existeCliente) {
+            throw new RuntimeException("Cliente no encontrado");
+        }
+
+        return citaRepository.findByClienteIdAndEstadoOrderByDiaAscHoraAsc(
+                clienteId,
+                "ACTIVA"
+        );
+    }
+
     private void crearNotificacionAdmin(String titulo, String mensaje, String tipo) {
         notificacionDao.crearNotificacion(
                 titulo,
@@ -298,5 +365,10 @@ public class CitaDaoImp implements CitaDao {
     @Override
     public List<Cita> filtrarCitas(Long clienteId, Long barberoId, LocalDate dia) {
         return citaRepository.filtrarCitas(clienteId, barberoId, dia);
+    }
+
+    @Override
+    public List<Cita> obtenerCitasCanceladas() {
+        return citaRepository.findByEstadoOrderByDiaDescHoraAsc("CANCELADA");
     }
 }

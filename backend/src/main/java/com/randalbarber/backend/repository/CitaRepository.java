@@ -49,10 +49,15 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             String estado
     );
 
+    List<Cita> findByEstadoOrderByDiaAscHoraAsc(String estado);
+
+    List<Cita> findByEstadoOrderByDiaDescHoraAsc(String estado);
+
     @Query("""
             SELECT c
             FROM Cita c
-            WHERE (:clienteId IS NULL OR c.cliente.id = :clienteId)
+            WHERE c.estado = 'ACTIVA'
+              AND (:clienteId IS NULL OR c.cliente.id = :clienteId)
               AND (:barberoId IS NULL OR c.barbero.id = :barberoId)
               AND (:dia IS NULL OR c.dia = :dia)
             ORDER BY c.dia DESC, c.hora ASC
@@ -62,8 +67,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("barberoId") Long barberoId,
             @Param("dia") LocalDate dia
     );
-    
-
 
     @Query("""
             SELECT c
@@ -73,5 +76,27 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             """)
     List<Cita> buscarHistorialPorCliente(
             @Param("clienteId") Long clienteId
-    );
+    );    
+
+    @Query("""
+        SELECT c
+        FROM Cita c
+        WHERE c.barbero.id = :barberoId
+          AND c.estado = 'ACTIVA'
+          AND (
+                c.dia < :hoy
+                OR (c.dia = :hoy AND c.hora <= :horaActual)
+              )
+        ORDER BY c.dia DESC, c.hora DESC
+        """)
+        List<Cita> buscarHistorialPorBarbero(
+                @Param("barberoId") Long barberoId,
+                @Param("hoy") LocalDate hoy,
+                @Param("horaActual") LocalTime horaActual
+        );
+
+        List<Cita> findByClienteIdAndEstadoOrderByDiaAscHoraAsc(
+                Long clienteId,
+                String estado
+        );
 }

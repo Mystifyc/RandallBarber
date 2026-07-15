@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.RequestHeader;
 import com.randalbarber.backend.controller.dto.HistorialCitaClienteResponse;
 import com.randalbarber.backend.model.dao.CitaDao;
 import com.randalbarber.backend.model.entity.Cita;
@@ -34,6 +34,51 @@ public class CitaController {
     @GetMapping
     public List<Cita> listarCi() {
         return citaDao.listarCitas();
+    }
+
+    @GetMapping("/filtrar")
+    public ResponseEntity<?> filtrarCitas(
+            @RequestHeader(value = "X-Rol-Usuario", required = false) String rol,
+            @RequestParam(required = false) Long clienteId,
+            @RequestParam(required = false) Long barberoId,
+            @RequestParam(required = false) String dia
+    ) {
+        if (!esAdmin(rol)) {
+            return ResponseEntity.status(403).body("Solo el administrador puede filtrar citas.");
+        }
+
+        LocalDate fecha = null;
+
+        if (dia != null && !dia.isBlank()) {
+            fecha = LocalDate.parse(dia);
+        }
+
+        List<Cita> citas = citaDao.filtrarCitas(clienteId, barberoId, fecha);
+        return ResponseEntity.ok(citas);
+    }
+
+    @GetMapping("/canceladas")
+    public ResponseEntity<?> obtenerCitasCanceladas(
+            @RequestHeader(value = "X-Rol-Usuario", required = false) String rol
+    ) {
+        if (!esAdmin(rol)) {
+            return ResponseEntity.status(403).body("Solo el administrador puede consultar citas canceladas.");
+        }
+
+        List<Cita> canceladas = citaDao.obtenerCitasCanceladas();
+        return ResponseEntity.ok(canceladas);
+    }
+
+    private boolean esAdmin(String rol) {
+        return rol != null && rol.equalsIgnoreCase("ADMIN");
+    }
+
+    private boolean esCliente(String rol) {
+    return rol != null && rol.equalsIgnoreCase("CLIENTE");
+    }
+
+    private boolean esBarbero(String rol) {
+    return rol != null && rol.equalsIgnoreCase("BARBERO");
     }
 
     @PostMapping
@@ -60,6 +105,40 @@ public class CitaController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }@GetMapping("/cliente/{clienteId}/activas")
+    public ResponseEntity<?> obtenerCitasActivasCliente(
+            @RequestHeader(value = "X-Rol-Usuario", required = false) String rol,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioId,
+            @PathVariable Long clienteId
+    ) {
+        if (!esCliente(rol)) {
+            return ResponseEntity.status(403).body("Solo el cliente puede consultar sus citas activas.");
+        }
+
+        if (usuarioId == null || !usuarioId.equals(clienteId)) {
+            return ResponseEntity.status(403).body("No puedes consultar citas de otro cliente.");
+        }
+
+        List<Cita> citas = citaDao.obtenerCitasActivasPorCliente(clienteId);
+        return ResponseEntity.ok(citas);
+    }
+
+    @GetMapping("/barbero/{barberoId}/historial")
+    public ResponseEntity<?> obtenerHistorialBarbero(
+            @RequestHeader(value = "X-Rol-Usuario", required = false) String rol,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioId,
+            @PathVariable Long barberoId
+    ) {
+        if (!esBarbero(rol)) {
+            return ResponseEntity.status(403).body("Solo el barbero puede consultar este historial.");
+        }
+
+        if (usuarioId == null || !usuarioId.equals(barberoId)) {
+            return ResponseEntity.status(403).body("No puedes consultar citas de otro barbero.");
+        }
+
+        List<Cita> historial = citaDao.obtenerHistorialPorBarbero(barberoId);
+        return ResponseEntity.ok(historial);
     }
 
     @GetMapping("/disponibles")

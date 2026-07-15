@@ -8,6 +8,7 @@ export interface Cita {
   id: number;
   dia: string;
   hora: string;
+  estado?: string;
   cliente: ReferenciaEntidad;
   barbero: ReferenciaEntidad;
   servicio: ReferenciaEntidad;
@@ -82,6 +83,67 @@ export const obtenerHistorialCitasCliente = async (
 ): Promise<HistorialCitaCliente[]> => {
   const response = await api.get<HistorialCitaCliente[]>(
     `/citas/cliente/${clienteId}/historial`
+  );
+
+  return response.data;
+};
+
+export interface FiltrosCitas {
+  clienteId?: number;
+  barberoId?: number;
+  dia?: string;
+}
+
+export const filtrarCitas = async (
+  filtros: FiltrosCitas
+): Promise<Cita[]> => {
+  const response = await api.get<Cita[]>("/citas/filtrar", {
+    params: filtros,
+    headers: {
+      "X-Rol-Usuario": "ADMIN",
+    },
+  });
+
+  return response.data;
+};
+
+export const obtenerCitasCanceladas = async (): Promise<Cita[]> => {
+  const response = await api.get<Cita[]>("/citas/canceladas", {
+    headers: {
+      "X-Rol-Usuario": "ADMIN",
+    },
+  });
+
+  return response.data;
+};
+
+export const obtenerHistorialCitasBarbero = async (
+  barberoId: number
+): Promise<Cita[]> => {
+  const response = await api.get<Cita[]>(
+    `/citas/barbero/${barberoId}/historial`,
+    {
+      headers: {
+        "X-Rol-Usuario": "BARBERO",
+        "X-Usuario-Id": String(barberoId),
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const obtenerCitasActivasCliente = async (
+  clienteId: number
+): Promise<Cita[]> => {
+  const response = await api.get<Cita[]>(
+    `/citas/cliente/${clienteId}/activas`,
+    {
+      headers: {
+        "X-Rol-Usuario": "CLIENTE",
+        "X-Usuario-Id": String(clienteId),
+      },
+    }
   );
 
   return response.data;

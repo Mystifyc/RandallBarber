@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/Authcontext";
 import NotificacionesPanel from "../dashboard/NotificacionesPanel";
-import { obtenerCitas, type Cita } from "../../api/citasApi";
+import { obtenerCitas, obtenerHistorialCitasBarbero, type Cita } from "../../api/citasApi";
 import { obtenerClientes, type Cliente } from "../../api/clientesApi";
 import { obtenerServicios, type Servicio } from "../../api/serviciosApi";
 import { obtenerBarberos, type Barbero } from "../../api/barberosApi";
@@ -13,6 +13,7 @@ function BarberPanel() {
 
   const [seccionActiva, setSeccionActiva] = useState<BarberSection>("inicio");
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [historialAtendidas, setHistorialAtendidas] = useState<Cita[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [servicios, setServicios] = useState<Servicio[]>([]);
   const [barberos, setBarberos] = useState<Barbero[]>([]);
@@ -20,21 +21,30 @@ function BarberPanel() {
 
   useEffect(() => {
     const cargarDatos = async () => {
+      if (!usuario) return;
+
       try {
         setCargandoDatos(true);
 
-        const [citasData, clientesData, serviciosData, barberosData] =
-          await Promise.all([
-            obtenerCitas(),
-            obtenerClientes(),
-            obtenerServicios(),
-            obtenerBarberos(),
-          ]);
+        const [
+          citasData,
+          clientesData,
+          serviciosData,
+          barberosData,
+          historialData,
+        ] = await Promise.all([
+          obtenerCitas(),
+          obtenerClientes(),
+          obtenerServicios(),
+          obtenerBarberos(),
+          obtenerHistorialCitasBarbero(usuario.id),
+        ]);
 
         setCitas(citasData);
         setClientes(clientesData);
         setServicios(serviciosData);
         setBarberos(barberosData);
+        setHistorialAtendidas(historialData);
       } catch (error) {
         console.error("Error cargando datos del panel del barbero:", error);
       } finally {
@@ -43,7 +53,7 @@ function BarberPanel() {
     };
 
     cargarDatos();
-  }, []);
+  }, [usuario]);
 
   const barberoActual = useMemo(() => {
     if (!usuario) return null;
@@ -113,8 +123,7 @@ function BarberPanel() {
               <span className="panel-user-name">{usuario.nombre}</span>
             </div>
           </div>
-
-          <NotificacionesPanel rol="BARBERO" usuarioId={usuario.id} />
+          <NotificacionesPanel rol="BARBERO" usuarioId={barberoActual?.id ?? usuario.id} />
         </>
       ) : null;
     }
@@ -171,6 +180,47 @@ function BarberPanel() {
                 ))
               ) : (
                 <p>No tienes citas asignadas por ahora.</p>
+              )}
+            </div>
+          </section>
+
+          <section className="panel-card">
+            <div className="card-header">
+              <div>
+                <p className="mini-tag">Historial</p>
+                <h2>Citas atendidas anteriormente</h2>
+              </div>
+            </div>
+
+            <div className="appointments-table">
+              {cargandoDatos ? (
+                <p>Cargando historial...</p>
+              ) : historialAtendidas.length > 0 ? (
+                historialAtendidas.map((cita) => (
+                  <div className="appointment-row" key={cita.id}>
+                    <div>
+                      <strong>
+                        {formatearFecha(cita.dia)} - {formatearHora(cita.hora)}
+                      </strong>
+                      <p>{obtenerNombreServicio(cita.servicio.id)}</p>
+                    </div>
+
+                    <div>
+                      <strong>Cliente</strong>
+                      <p>{obtenerNombreCliente(cita.cliente.id)}</p>
+                    </div>
+
+                    <div>
+                      <strong>Servicio realizado</strong>
+                      <span className="status-badge confirmed">Atendida</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-panel-state">
+                  <h3>No hay historial</h3>
+                  <p>Cuando atiendas citas, aparecerán en esta sección.</p>
+                </div>
               )}
             </div>
           </section>
